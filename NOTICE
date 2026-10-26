@@ -15,7 +15,9 @@ Upstream project (fetched, not redistributed)
 
 setup.sh clones this upstream repository at the commit recorded in
 upstream.lock and copies the macOS helper scripts into that work tree. The
-upstream source is not included in this repository.
+upstream source is not included in this repository, except for
+keymap/rainy75.keymap, which is the upstream keymap (Apache-2.0) with local
+changes and is copied back over the work tree during setup.
 
 ================================================================================
 Third-party components fetched at build time (NOT included here)

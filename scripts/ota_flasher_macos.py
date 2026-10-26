@@ -13,10 +13,16 @@ After the bridge has booted, write the full ZMK image with
 `install_zmk_macos.sh` which does both stages.
 
 The stock OTA protocol is write-only and the bridge is normally installed over
-USB HID. If macOS refuses to open the vendor interface, grant your terminal
-"Input Monitoring" in System Settings > Privacy & Security, or use a Linux VM.
+USB HID. macOS keeps the keyboard's HID device open in the system driver, so
+hidapi's default exclusive open fails with `OSError: open failed`. This file
+turns exclusive open off (`hid_darwin_set_open_exclusive(0)`) so the vendor
+interface can be opened alongside the system keyboard driver.
+
+If it still fails, grant your terminal "Input Monitoring" in
+System Settings > Privacy & Security, or use a Linux VM.
 """
 import argparse
+import ctypes
 import sys
 import time
 
@@ -27,6 +33,24 @@ except ImportError:
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
 import ota_flasher as ota  # noqa: E402
+
+
+def _allow_shared_open():
+    """Do not seize the keyboard exclusively from macOS's HID driver."""
+    if sys.platform != "darwin":
+        return
+    try:
+        lib = ctypes.CDLL(hid.__file__)
+        set_exclusive = lib.hid_darwin_set_open_exclusive
+        set_exclusive.argtypes = [ctypes.c_int]
+        set_exclusive.restype = None
+        set_exclusive(0)
+    except Exception:
+        # Older hidapi builds may not export the symbol; let open_path decide.
+        pass
+
+
+_allow_shared_open()
 
 
 class HidDevice:
@@ -80,9 +104,13 @@ def open_device(verbose=True):
         for d in infos:
             print("  " + _describe(d))
 
-    preferred = [d for d in infos
-                 if d.get("usage_page") == ota.USAGE_PAGE
-                 or d.get("interface_number") == ota.INTERFACE]
+    # Probe the vendor-defined OTA usage first. macOS reports all usages of
+    # interface 2 with the same path, so the keyboard usages would otherwise
+    # be tried (and time out) before the one that speaks OTA.
+    preferred = [d for d in infos if d.get("usage_page") == ota.USAGE_PAGE]
+    if not preferred:
+        preferred = [d for d in infos
+                     if d.get("interface_number") == ota.INTERFACE]
     ordered = preferred + [d for d in infos if d not in preferred]
 
     for d in ordered:

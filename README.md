@@ -12,15 +12,16 @@ Zephyr SDK, then flashed over USB from macOS.
 | Part | State |
 |---|---|
 | macOS native build (ANSI) | ✅ verified on macOS 27 / Apple Silicon |
-| macOS stock-OTA bridge flash (hidapi) | 🧪 implemented, first hardware flash pending |
+| macOS stock-OTA bridge flash (hidapi) | ✅ verified on hardware (Rainy 75 Color ANSI, 2026-10) |
 | ZMK DFU updates from macOS | ✅ upstream tool supports `/dev/cu.usbmodem*` |
-| Restore to stock from macOS | 🧪 implemented, first hardware flash pending |
+| Restore to stock from macOS | 🧪 implemented, not yet hardware-tested |
 | ISO build | ⚙️ supported by `--iso`, untested here |
-| Rainy 75 Color / Standard (RGB) | ✅ expected (same PCB as Pro); upstream calls it untested |
+| Rainy 75 Color / Standard (RGB) | ✅ verified on an ANSI Color unit |
 | Rainy 75 Lite (non-RGB) | ⚠️ boots, but RGB/LED indicators do nothing |
 
-The build side is proven. Treat the first flash as experimental until the status
-above changes; keep the stock image and read [recovery](docs/recovery.md).
+Build and first flash are verified on an ANSI Rainy 75 Color (Standard RGB) with
+macOS 27 / Apple Silicon. The restore-to-stock path is implemented but not yet
+exercised; keep the stock image and read [recovery](docs/recovery.md).
 
 ## What it does
 
@@ -80,6 +81,7 @@ To go back:
 ## Documentation
 
 - [Install](docs/install.md) — step-by-step build and first flash
+- [Keymap](keymap/README.md) — source keymap, Mac keys, Studio caveat
 - [Recovery](docs/recovery.md) — stock restore, bridge recovery, SWS path
 - [Troubleshooting](docs/troubleshooting.md) — Nix, CMake, HID permissions, ports
 
@@ -114,18 +116,29 @@ refuses, the fallback is a Linux VM (the upstream project's documented path).
 - **Unofficial.** No warranty. Flashing can brick the keyboard; recovery may
   need a Telink burning board on the SWS pads.
 
-## Rebuilding after a keymap change
+## Keymap editing
 
-```bash
-cd rainy75-zmk-macos
-./setup.sh --ansi
-./flash.sh
-```
+Two workflows, and they do not mix well:
 
-`setup.sh` does not overwrite the keymap in `.work/rainy75-zmk`; edit
-`.work/rainy75-zmk/zmk/boards/rainy75/rainy75.keymap` and rebuild. Most day-to-day
-remapping can be done live in [ZMK Studio](https://zmk.studio) instead
-(`Fn + Esc` to unlock).
+- **ZMK Studio** — quick live remapping, no rebuild. Open
+  [zmk.studio](https://zmk.studio), connect USB, press `Fn + Esc`, edit and save.
+  Studio stores the changes **on the keyboard**, and it currently has no
+  export/import.
+- **Source keymap (recommended for a reproducible setup)** — edit
+  [`keymap/rainy75.keymap`](keymap/rainy75.keymap), then:
+
+  ```bash
+  ./setup.sh --ansi     # or --iso
+  ./flash.sh
+  ```
+
+  `setup.sh` copies `keymap/rainy75.keymap` over the upstream default before
+  building. If you have already used Studio, press **Restore Stock Settings** in
+  Studio after flashing; otherwise Studio's saved overrides mask the newly
+  compiled keymap.
+
+See [`keymap/README.md`](keymap/README.md) for Mac-specific notes, common ZMK
+behaviors, and examples.
 
 ## Contributing
 
@@ -148,6 +161,9 @@ flash.sh                 # stock -> ZMK / bridge finish / ZMK update
 restore-stock.sh         # ZMK -> stock
 upstream.lock            # pinned upstream repo + commit
 stock/fetch-stock.sh     # download vendor updater, extract restore image
+keymap/
+  rainy75.keymap         # source of truth, copied over the upstream default
+  README.md
 scripts/
   build_macos.sh         # Nix + Zephyr SDK build
   install_zmk_macos.sh   # OTA bridge + flash_mgmt two-stage install

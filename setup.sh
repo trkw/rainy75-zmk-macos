@@ -63,6 +63,14 @@ install -m 755 "$ROOT/scripts/install_zmk_macos.sh"  "$WORK/install_zmk_macos.sh
 install -m 755 "$ROOT/scripts/restore_stock_macos.sh" "$WORK/restore_stock_macos.sh"
 install -m 755 "$ROOT/scripts/ota_flasher_macos.py"  "$WORK/reverse/tools/ota_flasher_macos.py"
 
+# The repo's keymap overlay is the source of truth. It is copied over the
+# upstream default on every setup/build.
+if [[ -f "$ROOT/keymap/rainy75.keymap" ]]; then
+    echo "==> Installing keymap/rainy75.keymap"
+    install -m 644 "$ROOT/keymap/rainy75.keymap" \
+        "$WORK/zmk/boards/rainy75/rainy75.keymap"
+fi
+
 # Keep the managed files out of `git status` in the work tree.
 EXCLUDE="$WORK/.git/info/exclude"
 for f in /build_macos.sh /install_zmk_macos.sh /restore_stock_macos.sh \

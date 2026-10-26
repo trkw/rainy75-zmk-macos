@@ -37,6 +37,11 @@ package (venv, for nanopb). If you built by hand, install both.
 
 Symptoms: `Keyboard not found`, `open failed`, or no OTA interface answers.
 
+The stock keyboard's HID device is already held by macOS's keyboard driver.
+`ota_flasher_macos.py` therefore calls `hid_darwin_set_open_exclusive(0)` before
+opening it; without that, every `open_path` fails with `OSError: open failed`.
+Make sure you are using the current script from this repository.
+
 1. Connect USB, power on, `Fn + Tab` until Esc lights up.
 2. Close VIA / any browser tab or app that may hold the HID interface.
 3. Grant your terminal **Input Monitoring**:
