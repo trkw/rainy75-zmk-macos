@@ -1,0 +1,50 @@
+Rainy 75 ZMK macOS setup
+Copyright 2026 trkw
+
+This product includes original scripts and documentation developed for this
+project, licensed under the Apache License, Version 2.0 (see LICENSE).
+
+================================================================================
+Upstream project (fetched, not redistributed)
+================================================================================
+
+  Wobkey Rainy 75 Pro — ZMK firmware & reverse engineering
+  Copyright 2025-2026 scholzri
+  https://github.com/scholzri/rainy75-zmk
+  Apache-2.0
+
+setup.sh clones this upstream repository at the commit recorded in
+upstream.lock and copies the macOS helper scripts into that work tree. The
+upstream source is not included in this repository.
+
+================================================================================
+Third-party components fetched at build time (NOT included here)
+================================================================================
+
+  ZMK Firmware   MIT          https://github.com/zmkfirmware/zmk
+  Zephyr RTOS    Apache-2.0   https://github.com/zephyrproject-rtos/zephyr
+  MCUboot        Apache-2.0   https://github.com/mcu-tools/mcuboot
+  hal_telink     Apache-2.0   https://github.com/telink-semi/hal_telink
+
+The default build uses the upstream project's open Bluetooth LE controller and
+does not link the proprietary Telink BLE controller library.
+
+================================================================================
+Proprietary material (NOT included)
+================================================================================
+
+The Wobkey firmware updater (.exe), the stock Evision firmware image, the Telink
+BLE controller blob, the vendor datasheet, and the decompiled firmware are
+copyright of their respective owners (Telink Semiconductor / Wobkey / Evision
+Semiconductor). They are not part of this repository.
+
+stock/fetch-stock.sh downloads the official updater from Wobkey at the user's
+request and extracts the stock restore image locally under .work/ (gitignored).
+Users are responsible for complying with the vendor's terms.
+
+================================================================================
+No affiliation
+================================================================================
+
+This is an independent community project. It is not affiliated with or endorsed
+by Wobkey, Telink, Evision, or the upstream rainy75-zmk project.

@@ -1,0 +1,11 @@
+# macOS / local only
+.DS_Store
+.work/
+out/
+.venv/
+__pycache__/
+*.pyc
+
+# Downloaded vendor updater and extracted firmware (proprietary, never commit)
+*.exe
+*.bin
