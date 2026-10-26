@@ -78,6 +78,12 @@ To go back:
 ./restore-stock.sh
 ```
 
+## Web launcher
+
+An experimental web configurator for the same ZMK firmware is available at
+**<https://trkw.github.io/rainy75-launcher/>** (Chrome/Edge, USB). It is a
+separate project: <https://github.com/trkw/rainy75-launcher>.
+
 ## Documentation
 
 - [Install](docs/install.md) — step-by-step build and first flash
